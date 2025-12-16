@@ -45,7 +45,7 @@ ISM Retention Policy (`wazuh_retention-180d`):
 6. **Retention**: ISM policy (hot → delete after 180d) + NFS cron offload.
 7. **Agent Deployment**: Clean reinstall pointing to Manager IP.
 
-See `lessons-learned.md` for detailed troubleshooting.
+See `lessonslearned.md` for detailed troubleshooting.
 
 ## Skills Demonstrated 
 - Distributed SIEM architecture and troubleshooting (auth chains, multiprocessing errors).

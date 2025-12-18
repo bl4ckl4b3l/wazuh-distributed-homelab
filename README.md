@@ -17,12 +17,19 @@
 
 
 ## Key Achievements
-- Password synchronization across distributed components (indexer internal users vs. Manager API/JWT).
-- Resolved recurrent API crashes (Error 900/BrokenProcessPool) via resource tuning and process cleanup.
-- Enabled raw syslog ingestion from UDM-Pro (port 514 UDP) + archives indexing (`wazuh-archives-*`).
-- Configured ISM policy for 180-day indexed alert retention.
-- Automated NFS offload of compressed archives for multi-year forensic retention.
-- Deployed endpoint agents with secure TCP communication (port 1514).
+- Deployed distributed Wazuh cluster in Proxmox VE (separate VMs for Indexer ~100GB disk, Manager, Dashboard).
+- Resolved complex distributed connectivity issues:
+  - Password synchronization across Indexer internal users, Manager API (JWT), and Dashboard (manual propagation + keystore updates).
+  - API daemon crashes (Error 900/BrokenProcessPool) via resource tuning, orphaned process cleanup, and process_pool_size reduction.
+  - YAML syntax errors in Dashboard config causing "server not ready" state.
+- Enabled raw syslog ingestion from Ubiquiti UDM-Pro (port 514 UDP) with archives indexing (`wazuh-archives-*` pattern in OpenSearch Dashboards).
+- Implemented hybrid log retention:
+  - Indexed alerts: 180-day hot retention with automated deletion via Index State Management (ISM) policy.
+  - Raw archives: Long-term (1-2+ years) offload to TrueNAS NFS share via daily cron job moving compressed files.
+- Migrated host Docker runtime from confined snap to official Docker CE:
+  - Full backup/restore of 12 named volumes and images using rsync and tar via temp containers.
+  - Recreated custom networks (Traefik proxy bridge, macvlan for direct LAN IPs).
+  - Enabled comprehensive container monitoring in Wazuh (json.log application logs + Docker wodle listener for runtime events) using isolated Python virtual environment to resolve dependency conflicts.
 
 ## Dashboard Screenshots
 
@@ -34,6 +41,11 @@ Final working Dashboard with agent monitoring, vulnerability detection, SCA, and
 ISM Retention Policy (`wazuh_retention-180d`):
 
 <img width="1732" height="801" alt="image" src="https://github.com/user-attachments/assets/cf293973-b31e-4630-9b29-19cf06eee9c0" />
+
+**Dashboard Highlights**
+- Endpoint monitoring (Ubuntu VM agent) with FIM, SCA, vulnerability detection, MITRE ATT&CK mapping.
+- Network visibility via UDM-Pro syslog.
+- Container security (runtime events + application logs).
 
 
 ## Setup Steps Summary
@@ -48,9 +60,10 @@ ISM Retention Policy (`wazuh_retention-180d`):
 See `lessonslearned.md` for detailed troubleshooting.
 
 ## Skills Demonstrated 
-- Distributed SIEM architecture and troubleshooting (auth chains, multiprocessing errors).
-- Log lifecycle management (ISM policies, NFS archival).
-- Network/security integrations (syslog, agents, firewalls).
-- Configuration debugging (YAML/XML, systemd, logs).
+- Distributed SIEM architecture and troubleshooting (auth chains, multiprocessing errors, API/JWT).
+- Log lifecycle management (ISM policies, NFS archival, cron automation).
+- Container runtime migration and monitoring (snap → official Docker, wodle configuration, virtual environments).
+- Network/security integrations (syslog, agents, macvlan, firewalls, reverse proxy).
+- Configuration debugging (XML/YAML, systemd, APT repo management, GPG conflicts).
 
 This project showcases initiative in building a scalable, secure homelab SIEM—perfect for SOC/SECOPS roles.
